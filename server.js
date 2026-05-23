@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
@@ -10,6 +11,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 const STUDENTS_FILE = path.join(__dirname, 'students.json');
+tokens = new Map();
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
@@ -23,31 +25,35 @@ app.post('/api/login', (req, res) => {
   const students = JSON.parse(fs.readFileSync(STUDENTS_FILE, 'utf8'));
   const student = students.find(s => s.username === username && s.password === password);
   if (!student) return res.status(401).json({ error: 'Invalid username or password' });
-  res.json({ username });
+
+  const token = crypto.randomBytes(32).toString('hex')
+  tokens.set(token, { username: 'alice', role: 'student', expires: Date.now() + 8 * 60 * 60 * 1000 });
+  res.json({ token, username });
 });
 
-
-app.get('/terminal.html', (req, res) => {
-  //check logged in
-  const username = req.query.username;
-
-  if (username){
-    res.sendFile(path.join(__dirname, 'terminal.html'));
+function validateToken(token) {
+  const session = tokens.get(token)  
+  
+  if (!session) return null       
+  
+  if (Date.now() > session.expires) {
+    tokens.delete(token)          
+    return null
   }
-  else{
-    res.redirect('/index.html');
-  }
-
-});
+  
+  return session                    
+}
 
 wss.on('connection', (ws, req) => {
   const url = new URL(req.url, 'http://x');
   const username = url.searchParams.get('username');
+  const token = url.searchParams.get('token');
 
-  if (!username) { 
-    console.log('wss failed to connect, no username')
-    ws.close(); 
-    return; 
+  // check token is valid
+  const session = validateToken(token)       
+  if (!session) {
+    ws.close() 
+    return
   }
 
   const shell = pty.spawn('docker', [

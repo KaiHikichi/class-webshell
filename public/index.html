@@ -3,16 +3,20 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login — Classroom Terminal</title>
+  <title>Login</title>
   <link rel="stylesheet" href="/style.css"/>
 </head>
 <body>
-  <div class="card">
+
+  <header>
     <div class="logo">
       <div class="logo-icon">&gt;_</div>
-      Classroom Terminal
+      <div class="logo-name">Science Alive Terminal</div>
     </div>
-    <h2>Sign in to get started</h2>
+    <div class="spacer"></div>
+  </header>
+  
+  <div class="card">
 
     <label>Username</label>
     <input type="text" id="username"/>
@@ -53,8 +57,6 @@
           body: JSON.stringify({ username, password })
         });
 
-        const data = await res.json();
-
         if (!res.ok) {
           error.textContent = data.error || 'Login failed.';
           btn.disabled = false;
@@ -62,8 +64,13 @@
           return;
         }
 
+        const data = await res.json();
+        sessionStorage.setItem('token', data.token)
+        sessionStorage.setItem('username', data.username);
+        
+
         //if request successful redirect to terminal
-        window.location.href = `/terminal.html?username=${username}`;
+        window.location.href = `/terminal.html`;
 
       } catch (e) {
         error.textContent = 'Could not reach the server.';

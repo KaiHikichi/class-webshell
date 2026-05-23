@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Terminal — Classroom</title>
+  <title>Science Alive Terminal</title>
 
   <!-- xterm.js -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css"/>
@@ -18,7 +18,7 @@
   <header>
     <div class="logo">
       <div class="logo-icon">&gt;_</div>
-      Classroom Terminal
+      <div class="logo-name">Science Alive Terminal</div>
     </div>
     <div class="status-pill" id="statusPill">
       <div class="status-dot"></div>
@@ -90,11 +90,11 @@
     
 
     function connect() {
-      const params = new URLSearchParams(window.location.search);
-      const username = params.get('username');
+      let token = sessionStorage.getItem('token');
+      let username = sessionStorage.getItem('username');
       
       const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-      ws = new WebSocket(`${protocol}://${location.host}?username=${username}`);
+      ws = new WebSocket(`${protocol}://${location.host}?username=${username}&token=${token}`);
 
       ws.onopen = () => {
         setStatus('connected', 'Connected');

@@ -51,6 +51,10 @@ header {
   color: #000; font-size: 13px; font-weight: 700;
 }
 
+.logo-name {
+  white-space: nowrap;
+}
+
 .spacer { flex: 1; }
 
 /* ── Badges ── */
@@ -149,6 +153,9 @@ header {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 40px;
+  width: 100%;     
+  max-width: 400px;   
+  margin: 0 auto;
 }
 
 /* ── Form elements ── */
