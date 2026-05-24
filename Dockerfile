@@ -13,11 +13,14 @@ RUN apt-get update && apt-get install -y \
 RUN useradd -m -s /bin/bash student
 
 # Friendly prompt and a welcome file
-RUN echo 'PS1="\[\033[01;32m\]student@terminal\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /home/student/.bashrc && \
+RUN echo 'PS1="\[\033[01;32m\]$USERNAME@terminal\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /home/student/.bashrc && \
     echo "Welcome! Try: ls, pwd, cd, mkdir, cat, echo, vim" > /home/student/README.txt && \
     chown -R student:student /home/student
+
+COPY startup.sh /startup.sh
+RUN chmod +x /startup.sh
 
 USER student
 WORKDIR /home/student
 
-CMD ["/bin/bash"]
+CMD ["/startup.sh"]

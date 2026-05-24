@@ -10,8 +10,8 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const STUDENTS_FILE = path.join(__dirname, 'students.json');
-const ADMINS_FILE = path.join(__dirname, 'admins.json');
+const USERS_FILE = path.join(__dirname, 'users.json');
+const GUESTS_FILE = path.join(__dirname, 'guests.json');
 tokens = new Map();
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -22,65 +22,100 @@ app.use(express.json());
 //routes
 
 app.post('/api/login', (req, res) => {
-	const { username, password } = req.body;
-	const students = JSON.parse(fs.readFileSync(STUDENTS_FILE, 'utf8'));
-	const admins = JSON.parse(fs.readFileSync(ADMINS_FILE, 'utf8'));
+	let { username, password } = req.body;
+	const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+	const guests = JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8'));
 
-	//check if admin
-	let role = 'admin';
-	let user = admins.find(s => s.username === username && s.password === password);
-	if (!user){
-		//check if student
-		role = 'student';
-		user = students.find(s => s.username === username && s.password === password);
-		if(!user){
-			//reject user
-			role = null;
-			return res.status(401).json({ error: 'Invalid username or password' });
+	//check if new guest account is being created
+	if (username == 'ScienceAliveGuest' && password == guests.password){
+		//create new guest account
+		let newID = 0;
+		if(guests.guests.length == 0){
+			newID = 0;
 		}
-	}
+		else{
+			newID = guests.guests.at(-1).id + 1;
+		}
+		
+		username = "guest" + newID;
 
-	const token = crypto.randomBytes(32).toString('hex')
-	tokens.set(token, { username: username, role: role, expires: Date.now() + 8 * 60 * 60 * 1000 });
-	res.json({ token, username, role });
+		const newGuest = {"username": username, "id": newID};
+		guests.guests.push(newGuest);
+
+		fs.writeFile(GUESTS_FILE, JSON.stringify(guests, null, 2), (err) => {
+			if (err) throw err;
+		});
+	}
+	
+	let role = 'student';
+	let guest = guests.guests.find(s => s.username === username);
+	let user = users.find(s => s.username === username && s.password === password);
+
+	if (guest && password == guests.password){		//check if guest
+		role = 'guest';
+		const token = crypto.randomBytes(32).toString('hex');
+		tokens.set(token, { username: username, role: role, expires: Date.now() + 8 * 60 * 60 * 1000 });
+		res.json({ token, username, role });
+	}
+	else if (user){		//check if user 
+		//check if admin
+		if(user.username == 'ScienceAliveAdmin'){
+			role = 'admin';
+		}
+		else{
+			role = 'student'
+		}
+		const token = crypto.randomBytes(32).toString('hex');
+		tokens.set(token, { username: username, role: role, expires: Date.now() + 8 * 60 * 60 * 1000 });
+		res.json({ token, username, role });
+	}
+	else{
+		//reject user
+		role = null;
+		return res.status(401).json({ error: 'Invalid username or password' });
+	}
 });
 
 function validateToken(token) {
-	const session = tokens.get(token)  
+	const info = tokens.get(token)  
 	
-	if (!session){
+	if (!info){
 		return null       
 	}
-	
-	if (Date.now() > session.expires) {
+
+	if (Date.now() > info.expires) {
 		tokens.delete(token)          
 		return null
 	}
 	
-	return session                    
+	return info                    
 }
 
+//todo handle admin / guest accounts
 wss.on('connection', (ws, req) => {
 	const url = new URL(req.url, 'http://x');
-	const username = url.searchParams.get('username');
+	let username = url.searchParams.get('username');
 	const token = url.searchParams.get('token');
 
 	// check token is valid
-	const session = validateToken(token)       
-	if (!session) {
+	const info = validateToken(token)       
+	if (!info) {
 		ws.close() 
 		return
 	}
 
+	let role = tokens.get(token).role;
+
 	const shell = pty.spawn('docker', [
 		'run', '--rm', '-it',
-		'--name', `student-${username}`,
+		'--name', `${username}`,
 		'--memory', '128m',
 		'--cpus', '0.5',
 		'--pids-limit', '50',
 		'--security-opt=no-new-privileges',
+		'--env', `USERNAME=${username}`,
 		'--cap-drop', 'ALL',
-		'--mount', `type=volume,source=student-${username},target=/home/student`,
+		'--mount', `type=volume,source=${username},target=/home/student`,
 		'classroom-student'
 	], {
 		name: 'xterm-color',
