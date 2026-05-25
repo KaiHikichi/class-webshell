@@ -25,9 +25,19 @@
     <input type="text" id="password"/>
 
     <button class="btn" id="loginBtn" onclick="login()">Log In</button>
-    <p>Admins use ScienceAliveAdmin as username</p>
-    <p>Guests use ScienceAliveGuest as username to create a new guest account</p>
-    <p>If you have already created a guest account use your assigned username</p>
+
+    <div style="border-top: 0.5px solid var(--border); padding-top: 16px; margin-top: 20px; display: flex; flex-direction: column; gap: 8px;">
+      <p style="font-size: 15px; color: var(--text); display: flex; align-items: center; gap: 8px;">
+    	Admin username: ScienceAliveAdmin
+      </p>
+      <p style="font-size: 15px; color: var(--text); display: flex; align-items: center; gap: 8px;">
+        Guest create: ScienceAliveGuest + guest password
+      </p>
+      <p style="font-size: 15px; color: var(--text); display: flex; align-items: center; gap: 8px;">
+        Guest log in: guestX + guest password
+      </p>
+    </div>
+
     <div class="error" id="error"></div>
   </div>
 
