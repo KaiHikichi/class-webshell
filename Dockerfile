@@ -28,6 +28,15 @@ RUN mkdir -p /home/student/MAZE/entrance && \
     mkdir -p /home/student/MAZE/entrance/left/down && \
     mkdir -p /home/student/MAZE/entrance/right/rope_swing && \
     mkdir -p /home/student/MAZE/entrance/right/narrow_cliff
+
+RUN chown student:student /home/student/MAZE && \
+    chown student:student /home/student/MAZE/entrance && \
+    chown student:student /home/student/MAZE/entrance/left && \
+    chown student:student /home/student/MAZE/entrance/left/up && \
+    chown student:student /home/student/MAZE/entrance/left/down && \
+    chown student:student /home/student/MAZE/entrance/right && \
+    chown student:student /home/student/MAZE/entrance/right/rope_swing && \
+    chown student:student /home/student/MAZE/entrance/right/narrow_cliff
  
 RUN echo "At the entrance of the maze there are two path ways, one heading left and one heading right. You hear a low rumbling coming from the right." > /home/student/MAZE/entrance/sign.txt && \
     chown goblin:monsters /home/student/MAZE/entrance/sign.txt
