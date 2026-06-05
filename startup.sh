@@ -1,6 +1,9 @@
 #!/bin/bash
 # Save username to environment so .bashrc can use it
-echo "export USERNAME=$USERNAME" >> /home/student/.bashrc
-echo 'PS1="\[\033[01;32m\]$USERNAME@terminal\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /home/student/.bashrc
+if [ ! -f /home/student/.setup_done ]; then
+    echo "export USERNAME=$USERNAME" >> /home/student/.bashrc
+    echo 'PS1="\[\033[01;32m\]$USERNAME@terminal\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /home/student/.bashrc
+    touch /home/student/.setup_done
+fi
 
 exec /bin/bash

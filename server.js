@@ -138,7 +138,7 @@ wss.on('connection', (ws, req) => {
 	const shell = pty.spawn('docker', [
 		'run', '--rm', '-it',
 		'--name', `${username}`,
-		'--memory', '128m',
+		'--memory', '40m',
 		'--cpus', '0.5',
 		'--pids-limit', '50',
 		'--security-opt=no-new-privileges',

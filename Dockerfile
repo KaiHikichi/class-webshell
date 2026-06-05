@@ -22,44 +22,278 @@ RUN usermod -aG heroes wizard
 
 RUN echo "Welcome! Try: ls, pwd, cd, mkdir, cat, echo, vim" > /home/student/README.txt 
 
-# Set up maze
+
+# ── Maze structure ────────────────────────────────────────────────────────────
 RUN mkdir -p /home/student/MAZE/entrance && \
     mkdir -p /home/student/MAZE/entrance/left/up && \
-    mkdir -p /home/student/MAZE/entrance/left/down && \
-    mkdir -p /home/student/MAZE/entrance/right/rope_swing && \
-    mkdir -p /home/student/MAZE/entrance/right/narrow_cliff
+    mkdir -p /home/student/MAZE/entrance/left/down/river/swim && \
+    mkdir -p /home/student/MAZE/entrance/left/down/river/follow && \
+    mkdir -p /home/student/MAZE/entrance/left/down/river/follow/cave && \
+    mkdir -p /home/student/MAZE/entrance/left/down/river/follow/cave/treasure_room && \
+    mkdir -p /home/student/MAZE/entrance/right/rope_swing/pool/surface && \
+    mkdir -p /home/student/MAZE/entrance/right/rope_swing/pool/deeper && \
+    mkdir -p /home/student/MAZE/entrance/right/narrow_cliff/market && \
+    mkdir -p /home/student/MAZE/entrance/right/narrow_cliff/market/back_room
+ 
+# ── Signs ─────────────────────────────────────────────────────────────────────
+ 
+RUN cat > /home/student/MAZE/entrance/sign.txt << 'SIGN'
+=== ENTRANCE ===
+ 
+You stand at the entrance of a dark maze.
+Two tunnels stretch before you.
+ 
+  left/    - A dimly lit passage. Cool air drifts out.
+  right/   - A wider tunnel. A low rumbling echoes from within.
+ 
+A stone tablet on the wall reads:
+  "Five fragments of the password are hidden in the maze.
+   Find them all to escape."
+SIGN
 
-RUN chown student:student /home/student/MAZE && \
-    chown student:student /home/student/MAZE/entrance && \
-    chown student:student /home/student/MAZE/entrance/left && \
-    chown student:student /home/student/MAZE/entrance/left/up && \
-    chown student:student /home/student/MAZE/entrance/left/down && \
-    chown student:student /home/student/MAZE/entrance/right && \
-    chown student:student /home/student/MAZE/entrance/right/rope_swing && \
-    chown student:student /home/student/MAZE/entrance/right/narrow_cliff
+#   left
  
-RUN echo "At the entrance of the maze there are two path ways, one heading left and one heading right. You hear a low rumbling coming from the right." > /home/student/MAZE/entrance/sign.txt && \
-    chown goblin:monsters /home/student/MAZE/entrance/sign.txt
+RUN cat > /home/student/MAZE/entrance/left/sign.txt << 'SIGN'
+=== LADDER ROOM ===
  
-RUN echo "You enter a small room with a ladder in the center. The ladder goes down through the floor or up through the ceiling. A faint light shines through from above." > /home/student/MAZE/entrance/left/sign.txt && \
-    chown wizard:heroes /home/student/MAZE/entrance/left/sign.txt
+A small stone room with a wooden ladder in the centre.
+Faint light filters down from above.
+The sound of rushing water rises from below.
  
-RUN echo "You climb up the ladder, the further up you climb the brighter the light gets. Eventually you reach the surface, there doesn't seem to be anything interesting here." > /home/student/MAZE/entrance/left/up/sign.txt && \
-    chown wizard:heroes /home/student/MAZE/entrance/left/up/sign.txt
+  up/    - The ladder leads up towards the light.
+  down/  - The ladder descends into darkness.
+SIGN
  
-RUN echo "As you descend the ladder the air becomes damp. At the bottom you find a winding cave with an underground river running through it." > /home/student/MAZE/entrance/left/down/sign.txt && \
-    chown wizard:heroes /home/student/MAZE/entrance/left/down/sign.txt
+RUN cat > /home/student/MAZE/entrance/left/up/sign.txt << 'SIGN'
+=== SURFACE ===
  
-RUN echo "You enter a large room with a deep chasm in the middle and a door on the other side. A loud rumbling sound is coming from the chasm. There is a long rope hanging above the chasm that could be used to swing across or a narrow cliff that you could shimmy across." > /home/student/MAZE/entrance/right/sign.txt && \
-    chown wizard:heroes /home/student/MAZE/entrance/right/sign.txt
+You climb out into the open air.
+A grey sky stretches overhead. There is nothing here but
+an old scarecrow and an empty field.
  
-RUN echo "You grab the rope to swing across the chasm. As you swing the rope snaps and you plummet into the chasm. You land in a large pool of water being fed by a roaring underground river." > /home/student/MAZE/entrance/right/rope_swing/sign.txt && \
-    chown wizard:heroes /home/student/MAZE/entrance/right/rope_swing/sign.txt
+You feel watched.
  
-RUN echo "You carefully shimmy across the narrow cliff to the other side of the chasm. You open the door on the other side to find it is completely blocked by rubble." > /home/student/MAZE/entrance/right/narrow_cliff/sign.txt && \
-    chown wizard:heroes /home/student/MAZE/entrance/right/narrow_cliff/sign.txt
+  ../    - Climb back down.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/left/up/scarecrow.txt << 'SIGN'
+A battered scarecrow. Sewn into its chest is a scrap of paper.
+The paper reads:
+ 
+  PASSWORD FRAGMENT 1:  "dragon"
+ 
+  ../    - Head back down.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/left/down/sign.txt << 'SIGN'
+=== UNDERGROUND RIVER ===
+ 
+The air is cold and damp. A fast-moving river cuts through
+the cave floor, glowing faintly blue.
+ 
+  river/    - Approach the river.
+  ../       - Climb back up.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/left/down/river/sign.txt << 'SIGN'
+=== THE RIVER BANK ===
+ 
+The river roars past. The current looks strong.
+A narrow path follows the river deeper into the cave.
+ 
+  swim/     - Jump in and swim across.
+  follow/   - Follow the path along the river bank.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/left/down/river/swim/sign.txt << 'SIGN'
+=== SWEPT AWAY ===
+ 
+You leap into the river. The current is overwhelming.
+You are swept downstream and deposited, soaking wet,
+back at the entrance of the maze.
+ 
+  ../../../../    - Back to the entrance.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/left/down/river/follow/sign.txt << 'SIGN'
+=== RIVER PATH ===
+ 
+The path winds deeper into the cave. Strange glowing moss
+lights the way. You notice scratches on the wall —
+someone has been here before.
+ 
+  cave/    - Continue into the cave.
+  ../      - Turn back.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/left/down/river/follow/cave/sign.txt << 'SIGN'
+=== THE DEEP CAVE ===
+ 
+The cave opens into a larger chamber. Stalactites hang
+from the ceiling. In the far wall you can see a heavy door.
+ 
+  treasure_room/    - Try the heavy door.
+  ../               - Head back.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/left/down/river/follow/cave/note.txt << 'SIGN'
+A crumpled note on the cave floor. It reads:
+ 
+  PASSWORD FRAGMENT 2:  "slays"
+ 
+  (scrawled underneath)
+  "The treasure room door is unlocked. I already took the gold.
+   Sorry."
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/left/down/river/follow/cave/treasure_room/sign.txt << 'SIGN'
+=== TREASURE ROOM ===
+ 
+The room is empty. Whoever left the note was not lying.
+All that remains is a wooden chest with a broken lock.
+Inside the chest is a small scroll.
+ 
+  ../    - Leave the treasure room.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/left/down/river/follow/cave/treasure_room/scroll.txt << 'SIGN'
+The scroll reads:
+ 
+  PASSWORD FRAGMENT 3:  "the"
+ 
+  Beneath the text is a rough map. It seems to point
+  towards the market on the other side of the chasm.
+SIGN
+ 
+#   right
+ 
+RUN cat > /home/student/MAZE/entrance/right/sign.txt << 'SIGN'
+=== THE CHASM ROOM ===
+ 
+A vast room with a deep chasm splitting the floor in two.
+On the far side you can see a door leading to a market.
+The rumbling is louder here — something stirs below.
+ 
+  rope_swing/      - A thick rope hangs above the chasm. Risky.
+  narrow_cliff/    - A narrow ledge runs along the wall. Slow but steady.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/sign.txt << 'SIGN'
+=== ROPE SWING ===
+ 
+You grab the rope and launch yourself across the chasm.
+Halfway across, the rope snaps.
+ 
+You plummet into the darkness below and land with a
+tremendous splash in an underground pool.
+ 
+  pool/    - Look around the pool.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/sign.txt << 'SIGN'
+=== THE UNDERGROUND POOL ===
+ 
+The pool is enormous. The water is icy cold.
+The river from the other side of the maze feeds into it here.
+Two options present themselves.
+ 
+  surface/    - Swim to a rocky ledge and climb out.
+  deeper/     - Dive deeper into the pool.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/surface/sign.txt << 'SIGN'
+=== ROCKY LEDGE ===
+ 
+You haul yourself out of the water. A narrow tunnel
+leads upward — it comes out near the entrance of the maze.
+ 
+Wedged in a crack in the rock is something shiny.
+ 
+  ../../../../../    - Back to the entrance.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/surface/coin.txt << 'SIGN'
+A gold coin with writing engraved on its face:
+ 
+  PASSWORD FRAGMENT 4:  "knight"
+ 
+  On the back: "The merchant knows the final word."
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/deeper/sign.txt << 'SIGN'
+=== THE DEEP ===
+ 
+You dive down. The water gets darker and colder.
+There is nothing here but an old boot and some gravel.
+ 
+You surface, disappointed.
+ 
+  ../    - Back to the pool.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/sign.txt << 'SIGN'
+=== NARROW CLIFF ===
+ 
+You press yourself against the wall and inch along the ledge.
+It takes a while but you make it across safely.
+The door on the other side opens into a bustling underground market.
+ 
+  market/    - Enter the market.
+  ../        - Shimmy back across.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/market/sign.txt << 'SIGN'
+=== THE UNDERGROUND MARKET ===
+ 
+Torches line the walls. Strange vendors sell stranger things.
+In the corner, a hooded merchant sits behind a cluttered stall.
+ 
+  back_room/    - Slip through a curtain behind the merchant stall.
+  ../           - Leave the market.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/market/back_room/sign.txt << 'SIGN'
+=== BACK ROOM ===
+ 
+A small dusty room behind the stall. Crates are stacked
+to the ceiling. On a crate in the middle of the room
+sits a sealed envelope addressed to "the brave adventurer."
+ 
+  ../    - Return to the market.
+SIGN
+ 
+RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/market/back_room/envelope.txt << 'SIGN'
+The envelope is unsealed. Inside is a single card:
+ 
+  PASSWORD FRAGMENT 5:  "darkness"
+ 
+  "You have found all five fragments. The password is:
+   the five words in the order you found them.
+   Good luck."
+SIGN
+ 
+# ── Ownership ─────────────────────────────────────────────────────────────────
+RUN chown -R student:student /home/student/MAZE
+ 
+RUN chown wizard:heroes /home/student/MAZE/entrance/sign.txt && \
+    chown wizard:heroes /home/student/MAZE/entrance/right/sign.txt && \
+    chown wizard:heroes /home/student/MAZE/entrance/right/rope_swing/sign.txt && \
+    chown wizard:heroes /home/student/MAZE/entrance/right/rope_swing/pool/deeper/sign.txt
+ 
+RUN chown wizard:heroes /home/student/MAZE/entrance/left/sign.txt && \
+    chown wizard:heroes /home/student/MAZE/entrance/left/down/sign.txt && \
+    chown wizard:heroes /home/student/MAZE/entrance/left/down/river/follow/cave/sign.txt && \
+    chown wizard:heroes /home/student/MAZE/entrance/left/down/river/follow/cave/treasure_room/sign.txt
+ 
+RUN chown wizard:heroes /home/student/MAZE/entrance/right/rope_swing/pool/sign.txt && \
+    chown wizard:heroes /home/student/MAZE/entrance/right/rope_swing/pool/surface/sign.txt
+ 
+RUN chown wizard:heroes /home/student/MAZE/entrance/right/narrow_cliff/market/sign.txt && \
+    chown wizard:heroes /home/student/MAZE/entrance/right/narrow_cliff/market/back_room/sign.txt && \
+    chown wizard:heroes /home/student/MAZE/entrance/right/narrow_cliff/market/back_room/envelope.txt
 
-
+RUN chown -R student:student /home/student
+ 
 COPY startup.sh /startup.sh
 RUN chmod +x /startup.sh
 
