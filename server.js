@@ -149,7 +149,6 @@ wss.on('connection', (ws, req) => {
 		'classroom-student'
 	], {
 		name: 'xterm-color',
-		cols: 80, rows: 24,
 		env: { ...process.env, TERM: 'xterm-256color' }
 	});
 

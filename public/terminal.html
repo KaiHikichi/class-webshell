@@ -27,12 +27,6 @@
     <div class="spacer"></div>
   </header>
 
-  <!-- Session tabs -->
-  <div class="session-bar">
-    <div class="tab active" id="tab-1">bash</div>
-    <div class="tab-add" title="New tab (coming soon)">+</div>
-  </div>
-
   <!-- Terminal -->
   <div class="terminal-wrap">
     <div class="terminal-frame">
@@ -83,10 +77,6 @@
       label.textContent = text;
     }
 
-    function showOverlay(show) {
-      document.getElementById('overlay').classList.toggle('hidden', !show);
-    }
-
     
 
     function connect() {
@@ -98,15 +88,16 @@
 
       ws.onopen = () => {
         setStatus('connected', 'Connected');
-        showOverlay(false);
         // Send initial size
+    
+        fitAddon.fit();
         ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
       };
 
       ws.onmessage = (e) => {
         const msg = JSON.parse(e.data);
         if (msg.type === 'output') term.write(msg.data);
-        if (msg.type === 'exit')   { setStatus('error', 'Session ended'); showOverlay(true); }
+        if (msg.type === 'exit')   { setStatus('error', 'Session ended'); }
       };
 
       ws.onerror = () => setStatus('error', 'Connection error');
