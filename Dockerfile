@@ -13,11 +13,13 @@ RUN apt-get update && apt-get install -y \
 RUN useradd -m -s /bin/bash student
 RUN useradd -m -s /bin/bash goblin
 RUN useradd -m -s /bin/bash wizard
+RUN useradd -m -s /bin/bash troll
 
 RUN groupadd heroes
 RUN groupadd monsters
 
 RUN usermod -aG monsters goblin
+RUN usermod -aG monsters troll
 RUN usermod -aG heroes wizard
 
 RUN echo "Welcome! Try: ls, pwd, cd, mkdir, cat, echo, vim" > /home/student/README.txt 
@@ -25,11 +27,11 @@ RUN echo "Welcome! Try: ls, pwd, cd, mkdir, cat, echo, vim" > /home/student/READ
 
 # ── Maze structure ────────────────────────────────────────────────────────────
 RUN mkdir -p /home/student/MAZE/entrance && \
-    mkdir -p /home/student/MAZE/entrance/left/up/field/barn && \
-    mkdir -p /home/student/MAZE/entrance/left/down/river/downstream && \
-    mkdir -p /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove && \
-    mkdir -p /home/student/MAZE/entrance/right/rope_swing/pool/surface && \
-    mkdir -p /home/student/MAZE/entrance/right/rope_swing/pool/deeper/ruins && \
+    mkdir -p /home/student/MAZE/entrance/left/up/field/barn/.trapdoor/box && \
+    mkdir -p /home/student/MAZE/entrance/left/down/river/downstream/.secret_passage && \
+    mkdir -p /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/.portal_frame && \
+    mkdir -p /home/student/MAZE/entrance/right/rope_swing/lake/surface && \
+    mkdir -p /home/student/MAZE/entrance/right/rope_swing/lake/deeper/ruins && \
     mkdir -p /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/treasure_room && \
     mkdir -p /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/armory && \
     mkdir -p /home/student/MAZE/entrance/right/narrow_cliff/cavern/shrine && \
@@ -40,7 +42,7 @@ RUN mkdir -p /home/student/MAZE/entrance && \
 RUN cat > /home/student/MAZE/entrance/sign.txt << SIGN
 === ENTRANCE ===
  
-You stand at the entrance of a dark maze.
+You stand at the entrance of a dark underground maze.
 Two tunnels stretch before you.
  
   left/    - A dimly lit passage. Cool air drifts out.
@@ -88,14 +90,18 @@ Sewn into the scarecrows chest is a scrap of paper.
 SIGN
  
 RUN cat > /home/student/MAZE/entrance/left/up/field/scarecrow.txt << SIGN
+=== SCARECROW ===
+
 A battered scarecrow stares blankly ahead.
 It seems to be pointing towards the barn.
+Someone left a note on the scarecrow, but the rain
+and dirt has made it unreadable.
 SIGN
  
 RUN cat > /home/student/MAZE/entrance/left/up/field/barn/sign.txt << SIGN
 === THE BARN ===
  
-The barn doors hang open. Inside it is dark and musty.
+The barn doors hang open. Inside is dark and musty.
 Rusted farm tools line the walls.
 A crow watches you from the rafters.
 SIGN
@@ -103,9 +109,46 @@ SIGN
 RUN cat > /home/student/MAZE/entrance/left/up/field/barn/crow_note.txt << SIGN
 Tied to the crows leg is a tiny note.
 You convince it to hold still long enough to read it.
-Most of the note has been ripped but you can make out one part of the password.
+Most of the note has been ripped up, but you can make out one part of the password.
  
   "_ _ A _ _"
+SIGN
+
+RUN cat > /home/student/MAZE/entrance/left/up/field/barn/.trapdoor/sign.txt << SIGN
+=== THE TRAPDOOR ===
+ 
+After sweeping aside some hay and dirt you find the secret trapdoor.
+You open it and climb down into a small dirt room with a wooden box.
+inside the box is two notes.
+SIGN
+
+RUN cat > /home/student/MAZE/entrance/left/up/field/barn/.trapdoor/box/sign.txt << SIGN
+=== THE BOX ===
+ 
+Two notes sit side by side, each giving different directions.
+It seems one was written by the wizard and the other by some imposter.
+Which one should you trust?
+SIGN
+
+RUN cat > /home/student/MAZE/entrance/left/up/field/barn/.trapdoor/box/note1.txt << SIGN
+=== NOTE 1 ===
+ 
+So you found your way here. 
+The maze holds even more secrets and treasure than you have already found. 
+Those who know where to look will find it. 
+
+I have hidden something in the mushroom grove.
+SIGN
+
+RUN cat > /home/student/MAZE/entrance/left/up/field/barn/.trapdoor/box/note2.txt << SIGN
+=== NOTE 2 ===
+ 
+So you found your way here. 
+The maze holds even more secrets and treasure than you have already found. 
+Those who know where to look will find it. 
+
+There is a secret passage in the underground river.
+You will need to hold your breathe to find it.
 SIGN
  
 RUN cat > /home/student/MAZE/entrance/left/down/sign.txt << SIGN
@@ -155,14 +198,57 @@ Looking deeper into it you see:
  
   The first number of the password is 4.
 SIGN
- 
+
+RUN cat > /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/.portal_frame/sign.txt << SIGN
+=== PORTAL FRAME===
+
+Hidden behind a thick clump of mushrooms is a large circle of stones.
+It looks to be a portal frame. 
+The stones sit silently, the portal is deactivated.
+Next to the portal is another pair of notes.  
+SIGN
+
+RUN cat > /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/.portal_frame/note1.txt << SIGN
+=== NOTE 1 ===
+
+This portal leads to my vault, but the magic has faded. 
+To reopen it you will need the glyph inscribed on my old helmet. 
+I lost it down the chasm once while I was trying to take the rope swing.
+SIGN
+
+RUN cat > /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/.portal_frame/note2.txt << SIGN
+=== NOTE 2 ===
+
+This portal leads to my vault, but the magic has faded. 
+To reopen it you will need the glyph inscribed on my old knife. 
+But someone must have stollen it from me while I was sleeping.
+It must have been the goblin.
+SIGN
+
 RUN cat > /home/student/MAZE/entrance/left/down/river/downstream/sign.txt << SIGN
 === DOWNSTREAM ===
  
 You jump into the river and let the current carry you downstream. 
 The further you go the lower the cave ceiling gets, forcing you to swim closer to the surface. 
 Eventually the gap between the water and the rock above closes entirely. 
-There is no way forward. You turn back against the current.
+There is no way forward. You must swim back against the current.
+SIGN
+
+RUN cat > /home/student/MAZE/entrance/left/down/river/downstream/.secret_passage/sign.txt << SIGN
+=== SECRET PASSAGE ===
+ 
+You take a deep breath and dive under the rock face as the cave ceiling meets the water
+Eventually, you see a faint glow above you, there is an air pocket.
+You swim up to catch your breath.
+The walls are slick with a luminous moss that casts everything in pale green light
+Someone has carved a message into the rock.
+SIGN
+
+RUN cat > /home/student/MAZE/entrance/left/down/river/downstream/.secret_passage/message.txt << SIGN
+ 
+" HA HA!!!
+  I made you go the wrong way
+  - The Troll"
 SIGN
  
 # ── RIGHT PATH ───────────────────────────────────────────────────────────────
@@ -172,8 +258,8 @@ RUN cat > /home/student/MAZE/entrance/right/sign.txt << SIGN
  
 A vast room with a deep chasm splitting the floor in two.
 On the far side you can see a door.
-The rumbling is louder here.
-How will you cross the chasm?
+The rumbling seems to be coming from the chasm.
+How will you cross?
  
   rope_swing/      - A thick rope hangs above the chasm. Risky.
   narrow_cliff/    - A narrow ledge runs along the wall. Slow but steady.
@@ -188,35 +274,36 @@ Halfway across the rope snaps.
 You plummet into darkness and land with a splash
 in an underground lake far below.
  
-  pool/    - Look around the pool.
+  lake/    - Look around the lake.
 SIGN
  
-RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/sign.txt << SIGN
-=== THE UNDERGROUND POOL ===
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/lake/sign.txt << SIGN
+=== THE UNDERGROUND LAKE ===
  
-The pool is enormous. The water is icy cold.
-A jet of water shoots out from the cave wall feeding the river.
+The lake is enormous. The water is icy cold. 
+A thundering waterfall pours from a crack in the 
+cave ceiling far above, its roar echoing off the walls.
  
   surface/    - Swim to a rocky ledge and climb out.
-  deeper/     - Dive deeper into the pool.
+  deeper/     - Dive deeper into the lake.
 SIGN
  
-RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/surface/sign.txt << SIGN
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/lake/surface/sign.txt << SIGN
 === ROCKY LEDGE ===
  
 You haul yourself out of the water.
-Wedged in a crack in the rock is something shiny.
+Wedged in a crack in the cave wall is something shiny.
  
 SIGN
  
-RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/surface/coin.txt << SIGN
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/lake/surface/coin.txt << SIGN
 A gold coin with a strange symbol engraved on its face.
-Could this be part of the password?
+It seems to be one part of the password.
  
   SYMBOL:  "#"
 SIGN
  
-RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/deeper/sign.txt << SIGN
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/lake/deeper/sign.txt << SIGN
 === THE DEEP ===
  
 You dive down. The water gets darker and colder.
@@ -225,13 +312,22 @@ Through the murk you can make out the outline of old ruins.
   ruins/    - Swim towards the ruins.
 SIGN
  
-RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/deeper/ruins/sign.txt << SIGN
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/lake/deeper/ruins/sign.txt << SIGN
 === UNDERWATER RUINS ===
  
-The ruins of a small building sit on the pool floor.
+The ruins of a small stone structure sit on the lake floor.
 A stone door hangs open.
-Inside is nothing but a stone table and an old helmet.
+Inside is nothing but a stone table and some rusty armor.
 Your lungs are burning. You need to surface soon.
+SIGN
+
+RUN cat > /home/student/MAZE/entrance/right/rope_swing/lake/deeper/ruins/.helmet.txt << SIGN
+=== OLD HELMET ===
+ 
+In the old underwater ruins you dig through the silt and mud and find the old helmet.
+You rub off the dirt and rust, but can not see anything that looks like a magic glyph.
+It is just a regular helmet.
+It seems you were tricked by the troll.
 SIGN
  
 RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/sign.txt << SIGN
@@ -278,7 +374,7 @@ It appears to be a list written in clumsy handwriting:
  
   TO DO:
   - get more stuff
-  - fix the chair
+  - find the rest of the password
 SIGN
  
 RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/treasure_room/sign.txt << SIGN
@@ -289,17 +385,15 @@ Piles of coins, trinkets, and stolen goods cover the floor.
 Most of it is junk but there is a lot of it.
 A locked chest sits in the corner. The key is nowhere to be found.
 Wedged under the chest to stop it wobbling is a folded note.
- 
-  ../    - Back to the den.
 SIGN
  
 RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/treasure_room/note.txt << SIGN
 The note wedged under the chest reads:
  
   "dear goblin,
-   sorry i took 3 of your coins
+   sorry i took a few of your coins
    ill give it back when we figure out what the password is
-   I only know the last number is 6
+   i only know the last number is 6
    - the other goblin"
 SIGN
  
@@ -308,18 +402,29 @@ RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/armory/sign.
  
 Calling it an armory is generous.
 A collection of dull knives, bent spears, and cracked shields
-leans against the cave wall in rough piles.
+are stacked on top of wooden crates in rough piles.
 None of the weapons look sharp enough to cut bread.
-A spear near the back has something tied to its handle.
+A knife near the front has something tied to its handle.
 SIGN
  
-RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/armory/spear_note.txt << SIGN
-A scrap of cloth tied to the handle of a bent spear.
+RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/armory/knife_note.txt << SIGN
+A scrap of cloth tied to the handle of a bent knife.
 Written on it in charcoal:
  
-  "THIS IS MY BEST SPEAR"
+  "THIS IS MY BEST KNIFE"
  
-  It is very clearly not a good spear.
+  It is very clearly not a good knife.
+SIGN
+
+RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/armory/.hidden_knife.txt << SIGN
+=== HIDDEN KNIFE ===
+
+After closer inspection of the armory you see a faint glowing coming from behind one of the crates.
+Wedged between the crate and the wall is a knife unlike the others.
+Its blade shimmers with a cold blue light.
+Inscribed on the knife is a glyph.
+
+  GLYPH: "~[*]~"
 SIGN
  
 # ── CAVERN ───────────────────────────────────────────────────────────────────
@@ -353,8 +458,8 @@ SIGN
 RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/cavern/shrine/book.txt << SIGN
 The book is open to a page near the end.
 Most of it is written in a language you cannot read.
-But the last entry is in plain english.
-The book seems very old and worn the page is very faded and scratched.
+But a scribbled note on the back page is written in plain english.
+The book is very old and worn, the page is faded and scratched.
 All you can make out is:
  
   "I found all five fragments.
@@ -380,16 +485,33 @@ SIGN
 RUN chown -R student:student /home/student/MAZE
 RUN find /home/student/MAZE -name "*.txt" -exec chown wizard:heroes {} \;
 
+RUN chown goblin:monsters /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/note.txt
+RUN chown goblin:monsters /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/treasure_room/note.txt
+RUN chown goblin:monsters /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/armory/knife_note.txt
+
+RUN chown wizard:heroes /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/box.txt
+
+RUN chown troll:monsters /home/student/MAZE/entrance/left/up/field/barn/.trapdoor/box/note2.txt
+RUN chown troll:monsters /home/student/MAZE/entrance/left/down/river/downstream/.secret_passage/message.txt
+RUN chown troll:monsters /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/.portal_frame/note1.txt
+RUN chown troll:monsters /home/student/MAZE/entrance/right/rope_swing/lake/deeper/ruins/.helmet.txt
+
 # ── Password ────────────────────────────────────────────────────────────────
+# locked door
 COPY scripts/enter_password /home/student/MAZE/entrance/right/narrow_cliff/cavern/tunnel/enter_password
 RUN chown wizard:heroes /home/student/MAZE/entrance/right/narrow_cliff/cavern/tunnel/enter_password
 RUN chmod 4711 /home/student/MAZE/entrance/right/narrow_cliff/cavern/tunnel/enter_password
 
 RUN chmod 000 /home/student/MAZE/entrance/right/narrow_cliff/cavern/tunnel/locked_door
 RUN chown wizard:heroes /home/student/MAZE/entrance/right/narrow_cliff/cavern/tunnel/locked_door
+
+#portal
+COPY scripts/enter_glyph /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/.portal_frame/enter_glyph
+RUN chown wizard:heroes /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/.portal_frame/enter_glyph
+RUN chmod 4711 /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/.portal_frame/enter_glyph
  
 
-
+# ── Docker ────────────────────────────────────────────────────────────────
 COPY scripts/startup.sh /startup.sh
 RUN chmod +x /startup.sh
 
