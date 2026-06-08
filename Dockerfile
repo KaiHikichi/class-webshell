@@ -130,7 +130,9 @@ SIGN
 RUN cat > /home/student/MAZE/entrance/left/down/river/upstream/sign.txt << SIGN
 === Upstream ===
  
-You follow the river upstream and come across an underground mushroom grove.
+You follow the river upstream. 
+The cave narrows and the sound of the water grows louder. 
+Around a bend the path opens into a glowing underground mushroom grove.
 
 mushroom_grove/   - Enter the mushroom grove
 SIGN
@@ -149,7 +151,7 @@ RUN cat > /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/bo
 A small wooden box, unlocked.
 Inside is a crystal ball.
 Upon touching it it begins to glow.
-Looking deeper into you see:
+Looking deeper into it you see:
  
   The first number of the password is 4.
 SIGN
@@ -157,9 +159,10 @@ SIGN
 RUN cat > /home/student/MAZE/entrance/left/down/river/downstream/sign.txt << SIGN
 === DOWNSTREAM ===
  
-You jump in the river and swim downstream.
-The further you go the lower the cave ceiling gets.
-Eventually there is not enough room to breath, you will need to fight against the current and turn back.
+You jump into the river and let the current carry you downstream. 
+The further you go the lower the cave ceiling gets, forcing you to swim closer to the surface. 
+Eventually the gap between the water and the rock above closes entirely. 
+There is no way forward. You turn back against the current.
 SIGN
  
 # ── RIGHT PATH ───────────────────────────────────────────────────────────────
@@ -202,11 +205,8 @@ RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/surface/sign.txt << 
 === ROCKY LEDGE ===
  
 You haul yourself out of the water.
-A narrow tunnel leads upward toward the maze entrance.
 Wedged in a crack in the rock is something shiny.
  
-  tunnel/    - Crawl through the tunnel back to the entrance.
-  ../        - Swim back.
 SIGN
  
 RUN cat > /home/student/MAZE/entrance/right/rope_swing/pool/surface/coin.txt << SIGN
@@ -240,10 +240,10 @@ RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/sign.txt << SIGN
 You press yourself against the wall and inch along the ledge.
 It takes a while but you make it across.
 The passage opens up on the other side.
-A a cold breeze comes from a large cavern ahead.
+A cold breeze comes from a large cavern ahead.
 Just before the cavern is a small burrow in the wall.
  
-  goblin_den/    - Checkout the burrow.
+  goblin_den/    - Squeeze into the burrow.
   cavern/        - Head towards the cold breeze.
 SIGN
  
@@ -252,8 +252,8 @@ SIGN
 RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/goblin_den/sign.txt << SIGN
 === GOBLIN DEN ===
  
-You follow the noise into a large cramped cave.
-It is clearly a home of sorts, if a messy one.
+You squeeze through the small goblin sized hole and enter the den.
+It is clearly a home of sorts, though a very messy one.
 Scraps of food, broken furniture and stolen trinkets
 cover every surface. An empty firepit smoulders in the centre.
 The goblin does not seem to be home right now.
@@ -327,7 +327,7 @@ SIGN
 RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/cavern/sign.txt << SIGN
 === THE GREAT CAVERN ===
  
-You step through the opening and catch your breath.
+You step through the opening and catch your breathe.
 The cavern is enormous, the ceiling disappears into darkness far above.
 The sound of dripping water echoes all around.
  
@@ -336,7 +336,7 @@ As your eyes adjust you can make out the shape of a shrine.
 To one side a tunnel opening is visible.
  
   shrine/    - Cross the cavern towards the light.
-  tunnel/    - Enter tunnel.
+  tunnel/    - Enter the tunnel.
 SIGN
  
 RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/cavern/shrine/sign.txt << SIGN
@@ -358,7 +358,7 @@ The book seems very old and worn the page is very faded and scratched.
 All you can make out is:
  
   "I found all five fragments.
-   The password is .5...."
+   The password is _ 5 _ _ _"
  
   Below that, a pressed flower and five small ink marks.
 SIGN
@@ -366,12 +366,14 @@ SIGN
 RUN cat > /home/student/MAZE/entrance/right/narrow_cliff/cavern/tunnel/sign.txt << SIGN
 === TUNNEL ===
  
-A wide tunnel opening in the cavern wall.
-Or at least it was wide once.
-It is now blocked by a huge stone door with a rusty mechanism at the centre for you to enter the password.
-You will not be allowed through until you have entered the password.
+A massive stone door blocks the entrance of the tunnel. 
+At its centre is a rusted iron mechanism with slots for entering a combination. 
+It will not budge without the correct password.
+
+  To unlock the door you will need to run enter_password with the password as an argument.
+  Ex: ./enter_password ABC12
  
-  /locked_door  - Attempt to open the door.
+  locked_door/  - Attempt to open the door.
 SIGN
 
 # ── Ownership ────────────────────────────────────────────────────────────────
