@@ -1,0 +1,117 @@
+===========================================================
+               THE ALCHEMIST'S COMPENDIUM
+===========================================================
+
+-----------------------------------------------------------
+1. HEALTH POTION
+-----------------------------------------------------------
+Description:
+   Instantly heals wounds and restores vitality. An essential 
+   companion for any long adventure.
+Visual Cue:
+   The cauldron glows gold upon completion.
+Recipe Sequence:
+   1. Add Mushrooms
+   2. Add Golden Carrot
+   3. Add Cave Salt
+   4. Stir
+
+-----------------------------------------------------------
+2. INVISIBILITY POTION
+-----------------------------------------------------------
+Description:
+   Grants absolute invisibility for one hour. Ideal for 
+   sneaking around unnoticed.
+Visual Cue:
+   The cauldron hisses and the steam completely vanishes.
+Recipe Sequence:
+   1. Add Moth Wings
+   2. Add Spider Eye
+   3. Stir
+   4. Add Cave Salt
+
+-----------------------------------------------------------
+3. STRENGTH POTION
+-----------------------------------------------------------
+Description:
+   Doubles the imbiber's physical power for thirty minutes. 
+   Handle with extreme caution.
+Visual Cue:
+   The cauldron shakes violently and glows a deep red.
+Recipe Sequence:
+   1. Add Thick Root
+   2. Add Dragon's Breath
+   3. Stir
+   4. Stir
+
+-----------------------------------------------------------
+4. NIGHT VISION POTION
+-----------------------------------------------------------
+Description:
+   Allows the drinker to see clearly in pitch-black conditions. 
+   Lasts two hours; invaluable for deep cave exploration.
+Visual Cue:
+   The cauldron radiates a pale blue glow.
+Recipe Sequence:
+   1. Add Mushrooms
+   2. Add Cave Salt
+   3. Stir
+   4. Add Moth Wings
+
+-----------------------------------------------------------
+5. POTION OF LUCK
+-----------------------------------------------------------
+Description:
+   Tips the scales of fate in your favor for one hour. 
+   Highly favored for games of chance, though results may vary.
+Visual Cue:
+   The cauldron pops loudly and the brew turns vibrant green.
+Recipe Sequence:
+   1. Add Four-Leaf Clover
+   2. Stir
+   3. Add Golden Carrot
+   4. Add Cave Salt
+
+-----------------------------------------------------------
+6. POTION OF COURAGE
+-----------------------------------------------------------
+Description:
+   Banishes fear and hesitation entirely. Warning: tastes 
+   absolutely terrible.
+Visual Cue:
+   The cauldron roars and blazes with a fierce orange flame.
+Recipe Sequence:
+   1. Add Thick Root
+   2. Add Golden Carrot
+   3. Stir
+   4. Add Newt
+
+-----------------------------------------------------------
+7. POTION OF SPEED
+-----------------------------------------------------------
+Description:
+   Permits the imbiber to move at twice their regular pace 
+   for twenty minutes. Side effects include hiccups and fast talking.
+Visual Cue:
+   The cauldron whistles and begins to spin rapidly.
+Recipe Sequence:
+   1. Add Newt
+   2. Add Spider Eye
+   3. Stir
+   4. Add Dragon's Breath
+
+-----------------------------------------------------------
+8. WATER BREATHING POTION
+-----------------------------------------------------------
+Description:
+   Allows underwater respiration for thirty minutes. Perfect 
+   for exploring long-submerged ruins.
+Visual Cue:
+   The cauldron shifts to a teal hue and bubbles slowly.
+Recipe Sequence:
+   1. Add Cave Salt
+   2. Add Mushrooms
+   3. Stir
+   4. Add Spider Eye
+
+===========================================================

@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     vim \
     less \
     tree \
+    gcc \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -510,6 +511,18 @@ COPY scripts/enter_glyph /home/student/MAZE/entrance/left/down/river/upstream/mu
 RUN chown wizard:heroes /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/.portal_frame/enter_glyph
 RUN chmod 4711 /home/student/MAZE/entrance/left/down/river/upstream/mushroom_grove/.portal_frame/enter_glyph
  
+# ── Potions ────────────────────────────────────────────────────────────────
+RUN mkdir -p /home/student/POTIONS/potions
+COPY scripts/cauldron.c /home/student/POTIONS/cauldron.c
+COPY scripts/recipe_book.txt /home/student/POTIONS/recipe_book.txt
+RUN chown student:student /home/student/POTIONS && \
+    chown student:student /home/student/POTIONS/potions && \
+    chown wizard:heroes /home/student/POTIONS/cauldron.c && \
+    chown wizard:heroes /home/student/POTIONS/recipe_book.txt
+
+
+RUN chmod 777 /home/student/POTIONS/cauldron.c && \
+    chmod 777 /home/student/POTIONS/recipe_book.txt
 
 # ── Docker ────────────────────────────────────────────────────────────────
 COPY scripts/startup.sh /startup.sh
