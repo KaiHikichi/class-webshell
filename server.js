@@ -52,7 +52,7 @@ app.post('/api/login', (req, res) => {
 	
 	let role = 'student';
 	let guest = guests.guests.find(s => s.username === username);
-	let user = users.users.find(s => s.username === username && s.password === password);
+	let user = users.users.find(s => s.username === username);
 
 	if (guest && password == class_password){		//check if guest
 		role = 'guest';
@@ -60,7 +60,7 @@ app.post('/api/login', (req, res) => {
 		tokens.set(token, { username: username, role: role, expires: Date.now() + 8 * 60 * 60 * 1000 });
 		return res.json({ token, username, role });
 	}
-	else if (user){		//check if user 
+	else if (user && password == class_password){		//check if user 
 		//check if admin
 		if(user.username == 'ScienceAliveAdmin'){
 			role = 'admin';
@@ -96,7 +96,7 @@ app.post('/api/sign-up', (req, res) => {
 	}
 
 	//if user does not already exists and password matches add the user to json
-	const newUser = {"username": username, "password": class_password};
+	const newUser = {"username": username};
 	users.users.push(newUser);
 
 	fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), (err) => {
