@@ -57,6 +57,35 @@ header {
 
 .spacer { flex: 1; }
 
+/* ── Layout: fill viewport ── */
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.terminal-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.terminal-frame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+#terminal {
+  flex: 1;
+  overflow: hidden;
+}
+
 /* ── Badges ── */
 .badge {
   font-size: 10px;
