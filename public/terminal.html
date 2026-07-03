@@ -12,6 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/xterm-addon-web-links@0.9.0/lib/xterm-addon-web-links.min.js"></script>
   <link rel="stylesheet" href="/style.css"/>
 </head>
+
 <body>
 
   <!-- Header -->
@@ -32,6 +33,28 @@
   <div class="terminal-wrap">
     <div class="terminal-frame">
       <div id="terminal"></div>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div class="modal-overlay is-hidden" id="adminModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <button class="btn-sm" id="adminRefreshBtn" onclick="populateAdminPanel()">⟳</button>
+        <button class="modal-close" onclick="closeAdmin()">✕</button>
+      </div>
+      <div class="table-wrap" style="text-align:left;">
+        <table>
+          <thead>
+            <tr>
+              <th>Volume Name</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="adminModalContent"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -111,7 +134,146 @@
       }
     }
 
-    
+    async function openAdmin() {
+      const btn = document.getElementById('adminBtn');
+
+      btn.disabled = true;
+      btn.textContent = 'Loading…';
+
+      try {
+        document.getElementById('adminModal').classList.remove('is-hidden');
+        populateAdminPanel();
+      } catch (e) {
+        // no-op
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Admin';
+      }
+    }
+
+    function closeAdmin() {
+      document.getElementById('adminModal').classList.add('is-hidden');
+    }
+
+    async function populateAdminPanel(){
+      try {
+        const tbody = document.getElementById('adminModalContent');
+        let token = sessionStorage.getItem('token');
+        let username = sessionStorage.getItem('username');
+
+        const res = await fetch('/api/populateAdmin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, token })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          tbody.innerHTML = '<tr><td colspan="3" class="empty"></td></tr>';
+          tbody.querySelector('.empty').textContent = data.error || 'Failed to load volumes.';
+          return;
+        }
+
+        if (!data.volumes.length) {
+          tbody.innerHTML = '<tr><td colspan="3" class="empty">No volumes found.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = '';
+        data.volumes.forEach(v => {
+          const tr = document.createElement('tr');
+
+          const nameTd = document.createElement('td');
+          nameTd.textContent = v.name;
+
+          const statusTd = document.createElement('td');
+          const badge = document.createElement('span');
+          badge.className = `status-badge ${v.active ? 'active' : 'inactive'}`;
+          badge.textContent = v.active ? 'Active' : 'Inactive';
+          statusTd.appendChild(badge);
+
+          const actionsTd = document.createElement('td');
+          actionsTd.className = 'actions';
+          actionsTd.style.justifyContent = 'flex-end';
+
+          const dropdown = document.createElement('div');
+          dropdown.className = 'dropdown';
+
+          const menu = document.createElement('div');
+          menu.className = 'dropdown-menu is-hidden';
+
+          const toggleBtn = document.createElement('button');
+          toggleBtn.className = 'dropdown-toggle';
+          toggleBtn.textContent = '⋯';
+          toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.dropdown-menu').forEach(el => {
+              if (el !== menu) el.classList.add('is-hidden');
+            });
+            menu.classList.toggle('is-hidden');
+          });
+
+          const endBtn = document.createElement('button');
+          endBtn.textContent = 'End session';
+          endBtn.disabled = !v.active;
+          endBtn.addEventListener('click', () => endSession(v.name));
+
+          const delBtn = document.createElement('button');
+          delBtn.className = 'danger';
+          delBtn.textContent = 'Delete volume';
+          delBtn.addEventListener('click', () => deleteVolume(v.name));
+
+          menu.appendChild(endBtn);
+          menu.appendChild(delBtn);
+          dropdown.appendChild(toggleBtn);
+          dropdown.appendChild(menu);
+          actionsTd.appendChild(dropdown);
+
+          tr.appendChild(nameTd);
+          tr.appendChild(statusTd);
+          tr.appendChild(actionsTd);
+          tbody.appendChild(tr);
+        });
+
+      } catch (e) {
+        console.log('Could not reach the server.');
+      }
+    }
+
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.add('is-hidden'));
+    });
+
+    async function endSession(name) {
+      if (!confirm(`End session for "${name}"?`)) return;
+      await adminAction('/api/endSession', name);
+    }
+
+    async function deleteVolume(name) {
+      if (!confirm(`Delete volume "${name}"? This cannot be undone.`)) return;
+      await adminAction('/api/deleteVolume', name);
+    }
+
+    async function adminAction(url, target) {
+      try {
+        const token = sessionStorage.getItem('token');
+        const username = sessionStorage.getItem('username');
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, token, target })
+        });
+
+        const data = await res.json();
+        if (!res.ok) alert(data.error || 'Action failed.');
+      } catch (e) {
+        alert('Could not reach the server.');
+      } finally {
+        populateAdminPanel();
+      }
+    }
 
     function connect() {
       let token = sessionStorage.getItem('token');

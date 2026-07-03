@@ -5,6 +5,7 @@ const WebSocket = require('ws');
 const pty = require('node-pty');
 const path = require('path');
 const fs = require('fs');
+const { execFile } = require('child_process');
 require('dotenv').config();
 
 
@@ -15,6 +16,7 @@ const wss = new WebSocket.Server({ server });
 const USERS_FILE = path.join(__dirname, 'userManagement/users.json');
 const GUESTS_FILE = path.join(__dirname, 'userManagement/guests.json');
 const class_password = process.env.class_password;
+const NAME_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
 tokens = new Map();
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -22,7 +24,7 @@ app.use(express.json());
 
 
 
-//routes
+//routes======================================================================================
 
 app.post('/api/login', (req, res) => {
 	let { username, password } = req.body;
@@ -120,7 +122,114 @@ app.post('/api/isAdmin', (req, res) => {
 	else{
 		return res.status(401).json({ error: 'Non admin token.' });
 	}
-	
+});
+
+app.post('/api/populateAdmin', (req, res) => {
+	let { username, token } = req.body;
+
+	if (validateToken(token) == null){
+		return res.status(401).json({ error: 'Invalid token.' });
+	}
+
+	const info = tokens.get(token)  
+	if(info.role != 'admin'){
+		return res.status(401).json({ error: 'Non admin token.' });
+	}
+
+	execFile('docker', ['volume', 'ls', '--format', '{{.Name}}'], (err, volOut, volErr) => {
+		if (err) {
+			console.error('docker volume ls failed:', volErr || err.message);
+			return res.status(500).json({ error: 'Failed to list volumes.' });
+		}
+
+		execFile('docker', ['ps', '--format', '{{.Names}}'], (err2, psOut, psErr) => {
+			if (err2) {
+				console.error('docker ps failed:', psErr || err2.message);
+				return res.status(500).json({ error: 'Failed to list containers.' });
+			}
+
+			const runningNames = new Set(psOut.split('\n').map(s => s.trim()).filter(Boolean));
+			const volumes = volOut.split('\n')
+				.map(s => s.trim())
+				.filter(Boolean)
+				.map(name => ({ name, active: runningNames.has(name) }));
+
+			return res.json({ volumes });
+		});
+	});
+});
+
+app.post('/api/endSession', (req, res) => {
+	let { username, token, target } = req.body;
+
+	if (validateToken(token) == null){
+		return res.status(401).json({ error: 'Invalid token.' });
+	}
+	const info = tokens.get(token);
+	if(info.role != 'admin'){
+		return res.status(401).json({ error: 'Non admin token.' });
+	}
+	if (!target || !NAME_PATTERN.test(target)) {
+		return res.status(400).json({ error: 'Invalid target name.' });
+	}
+
+	execFile('docker', ['kill', target], (err, stdout, stderr) => {
+		if (err) {
+			console.error('docker kill failed:', stderr || err.message);
+			return res.status(500).json({ error: 'Failed to end session.' });
+		}
+		return res.json({ success: true });
+	});
+});
+
+app.post('/api/deleteVolume', (req, res) => {
+	let { username, token, target } = req.body;
+
+	if (validateToken(token) == null){
+		return res.status(401).json({ error: 'Invalid token.' });
+	}
+	const info = tokens.get(token);
+	if(info.role != 'admin'){
+		return res.status(401).json({ error: 'Non admin token.' });
+	}
+	if (!target || !NAME_PATTERN.test(target)) {
+		return res.status(400).json({ error: 'Invalid target name.' });
+	}
+
+	execFile('docker', ['volume', 'rm', target], (err, stdout, stderr) => {
+		if (err) {
+			console.error('docker volume rm failed:', stderr || err.message);
+			return res.status(500).json({ error: 'Failed to delete volume. It may still be in use.' });
+		}
+
+		//remove target from user files
+		if (target === "ScienceAliveAdmin" || target === "ScienceAliveGuest") {
+			//do nothing
+		} else if (/^guest\d+$/.test(target)) {
+			const guests = JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8'));
+			let guestIndex = guests.guests.findIndex(s => s.username === target);
+			if (guestIndex !== -1) {
+				guests.guests.splice(guestIndex, 1);
+				fs.writeFileSync(GUESTS_FILE, JSON.stringify(guests, null, 2), 'utf8');
+			}
+		} else {
+			const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+			let userIndex = users.users.findIndex(s => s.username === target);
+			if (userIndex !== -1) {
+				users.users.splice(userIndex, 1);
+				fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+			}
+		}
+
+		//revoke any active session token(s) for target
+		for (const [t, tokenInfo] of tokens.entries()) {
+			if (tokenInfo.username === target) {
+				tokens.delete(t);
+			}
+		}
+
+		return res.json({ success: true });
+	});
 });
 
 function validateToken(token) {
@@ -138,7 +247,6 @@ function validateToken(token) {
 	return info                    
 }
 
-//todo handle admin / guest accounts
 wss.on('connection', (ws, req) => {
 	const url = new URL(req.url, 'http://x');
 	let username = url.searchParams.get('username');
@@ -150,8 +258,6 @@ wss.on('connection', (ws, req) => {
 		ws.close() 
 		return
 	}
-
-	let role = tokens.get(token).role;
 
 	const shell = pty.spawn('docker', [
 		'run', '--rm', '-it',
