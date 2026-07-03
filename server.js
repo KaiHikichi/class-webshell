@@ -79,7 +79,6 @@ app.post('/api/login', (req, res) => {
 	}
 });
 
-
 app.post('/api/sign-up', (req, res) => {
 	let { username, password } = req.body;
 	const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
@@ -103,6 +102,25 @@ app.post('/api/sign-up', (req, res) => {
 		if (err) throw err;
 	});
 	return res.json({ username });
+});
+
+app.post('/api/isAdmin', (req, res) => {
+	let { username, token } = req.body;
+
+	//validate token
+	if (validateToken(token) == null){
+		return res.status(401).json({ error: 'Invalid token.' });
+	}
+
+	//check admin
+	const info = tokens.get(token)  
+	if(info.role == 'admin'){
+		return res.json({ username, token });
+	}
+	else{
+		return res.status(401).json({ error: 'Non admin token.' });
+	}
+	
 });
 
 function validateToken(token) {

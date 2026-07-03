@@ -24,6 +24,7 @@
       <div class="status-dot"></div>
       <span id="statusText">Connecting…</span>
     </div>
+    <button class="btn is-hidden" id="adminBtn" onclick="openAdmin()">Admin</button>
     <div class="spacer"></div>
   </header>
 
@@ -35,6 +36,8 @@
   </div>
 
   <script>
+    checkAdmin();
+
     // ── xterm setup ──────────────────────────────────────────────────────────
     const term = new Terminal({
       fontFamily: '"JetBrains Mono", "Fira Code", monospace',
@@ -75,6 +78,37 @@
       const label = document.getElementById('statusText');
       pill.className = `status-pill ${state}`;
       label.textContent = text;
+    }
+
+    // ── Admin ────────────────────────────────────────────────────────────
+
+    async function checkAdmin() {
+      const btn = document.getElementById('adminBtn');
+
+      try {
+        const token = sessionStorage.getItem('token');
+        const username = sessionStorage.getItem('username');
+        
+        //send admin request to server
+        const res = await fetch('/api/isAdmin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, token })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.log("Error: isAdmin fail");
+          return;
+        }
+
+        //if request successful show admin button
+        btn.classList.remove('is-hidden');
+
+      } catch (e) {
+        console.log('Could not reach the server.');
+      }
     }
 
     

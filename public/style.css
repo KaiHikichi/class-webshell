@@ -99,6 +99,10 @@ body {
 .badge-accent { border-color: var(--accent); color: var(--accent); }
 .badge-yellow { border-color: var(--yellow); color: var(--yellow); }
 
+.is-hidden {
+    display: none !important;
+}
+
 /* ── Status pill ── */
 .status-pill {
   display: flex; align-items: center; gap: 6px;
