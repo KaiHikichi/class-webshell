@@ -39,7 +39,7 @@ app.post('/api/login', (req, res) => {
 	if(role == null){
 		//reject user
 		role = null;
-		return res.status(401).json({ error: 'Username not found' });
+		return res.status(401).json({ error: 'Invalid username or password' });
 	}
 
 	const token = crypto.randomBytes(32).toString('hex');
