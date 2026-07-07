@@ -35,7 +35,8 @@ docker --version
 Create a `.env` file in the project root:
 
 ```
-class_password=yourpasswordhere
+class_password=yourclasspasswordhere
+admin_password=youradminpasswordhere
 ```
  
 ## 4. Build the student Docker image
