@@ -16,6 +16,7 @@ const wss = new WebSocket.Server({ server });
 const USERS_FILE = path.join(__dirname, 'userManagement/users.json');
 const GUESTS_FILE = path.join(__dirname, 'userManagement/guests.json');
 const class_password = process.env.class_password;
+const admin_password = process.env.admin_password;
 const NAME_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
 tokens = new Map();
 
@@ -28,57 +29,22 @@ app.use(express.json());
 
 app.post('/api/login', (req, res) => {
 	let { username, password } = req.body;
-	const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-	const guests = JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8'));
 
 	//check if new guest account is being created
 	if (username == 'ScienceAliveGuest' && password == class_password){
-		//create new guest account
-		let newID = 0;
-		if(guests.guests.length == 0){
-			newID = 0;
-		}
-		else{
-			newID = guests.guests.at(-1).id + 1;
-		}
-		
-		username = "guest" + newID;
-
-		const newGuest = {"username": username, "id": newID};
-		guests.guests.push(newGuest);
-
-		fs.writeFileSync(GUESTS_FILE, JSON.stringify(guests, null, 2), (err) => {
-			if (err) throw err;
-		});
+		username = addGuest();
 	}
 	
-	let role = 'student';
-	let guest = guests.guests.find(s => s.username === username);
-	let user = users.users.find(s => s.username === username);
-
-	if (guest && password == class_password){		//check if guest
-		role = 'guest';
-		const token = crypto.randomBytes(32).toString('hex');
-		tokens.set(token, { username: username, role: role, expires: Date.now() + 8 * 60 * 60 * 1000 });
-		return res.json({ token, username, role });
-	}
-	else if (user && password == class_password){		//check if user 
-		//check if admin
-		if(user.username == 'ScienceAliveAdmin'){
-			role = 'admin';
-		}
-		else{
-			role = 'student'
-		}
-		const token = crypto.randomBytes(32).toString('hex');
-		tokens.set(token, { username: username, role: role, expires: Date.now() + 8 * 60 * 60 * 1000 });
-		return res.json({ token, username, role });
-	}
-	else{
+	let role = verifyLogin(username, password);
+	if(role == null){
 		//reject user
 		role = null;
-		return res.status(401).json({ error: 'Invalid username or password' });
+		return res.status(401).json({ error: 'Username not found' });
 	}
+
+	const token = crypto.randomBytes(32).toString('hex');
+	tokens.set(token, { username: username, role: role, expires: Date.now() + 8 * 60 * 60 * 1000 });
+	return res.json({ token, username, role });
 });
 
 app.post('/api/sign-up', (req, res) => {
@@ -245,6 +211,54 @@ function validateToken(token) {
 	}
 	
 	return info                    
+}
+
+function verifyLogin(username, password){
+	//check username exists
+	const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+	const guests = JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8'));
+
+	let guest = guests.guests.find(s => s.username === username);
+	let user = users.users.find(s => s.username === username);
+
+	if(!user && !guest){
+		return null;
+	}
+
+	//verify password
+	if(username == 'ScienceAliveAdmin'){
+		return password == admin_password ? 'admin' : null;
+	}
+	else if(guest){
+		return password == class_password ? 'guest' : null;
+	}
+	else{
+		return password == class_password ? 'student' : null;
+	}
+}
+
+//add new guest to GUEST_FILE and return guest username
+function addGuest(){
+	const guests = JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8'));
+
+	//create new guest account
+	let newID = 0;
+	if(guests.guests.length == 0){
+		newID = 0;
+	}
+	else{
+		newID = guests.guests.at(-1).id + 1;
+	}
+	
+	username = "guest" + newID;
+
+	const newGuest = {"username": username, "id": newID};
+	guests.guests.push(newGuest);
+
+	fs.writeFileSync(GUESTS_FILE, JSON.stringify(guests, null, 2), (err) => {
+		if (err) throw err;
+	});
+	return username;
 }
 
 wss.on('connection', (ws, req) => {
