@@ -23,7 +23,31 @@ tokens = new Map();
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
+//helpers======================================================================================
 
+// Reads a JSON file, creating it (and its parent directory) with default
+// content if it doesn't exist yet.
+function readJsonFile(filePath, defaultData) {
+	if (!fs.existsSync(filePath)) {
+		fs.mkdirSync(path.dirname(filePath), { recursive: true });
+		fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2));
+		return defaultData;
+	}
+	return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+// Ensures a directory exists before we ever try to read/write into it.
+function ensureDir(dirPath) {
+	if (!fs.existsSync(dirPath)) {
+		fs.mkdirSync(dirPath, { recursive: true });
+	}
+}
+
+// Make sure the userManagement directory + files exist at startup so the
+// server never depends on them already being there.
+ensureDir(path.join(__dirname, 'userManagement'));
+readJsonFile(USERS_FILE, { users: [] });
+readJsonFile(GUESTS_FILE, { guests: [] });
 
 //routes======================================================================================
 
@@ -49,7 +73,7 @@ app.post('/api/login', (req, res) => {
 
 app.post('/api/sign-up', (req, res) => {
 	let { username, password } = req.body;
-	const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+	const users = readJsonFile(USERS_FILE, { users: [] });
 	
 	//check if username already exists
 	let user = users.users.find(s => s.username === username);
@@ -66,9 +90,7 @@ app.post('/api/sign-up', (req, res) => {
 	const newUser = {"username": username};
 	users.users.push(newUser);
 
-	fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), (err) => {
-		if (err) throw err;
-	});
+	fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 	return res.json({ username });
 });
 
@@ -172,14 +194,14 @@ app.post('/api/deleteVolume', (req, res) => {
 		if (target === "ScienceAliveAdmin" || target === "ScienceAliveGuest") {
 			//do nothing
 		} else if (/^guest\d+$/.test(target)) {
-			const guests = JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8'));
+			const guests = readJsonFile(GUESTS_FILE, { guests: [] });
 			let guestIndex = guests.guests.findIndex(s => s.username === target);
 			if (guestIndex !== -1) {
 				guests.guests.splice(guestIndex, 1);
 				fs.writeFileSync(GUESTS_FILE, JSON.stringify(guests, null, 2), 'utf8');
 			}
 		} else {
-			const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+			const users = readJsonFile(USERS_FILE, { users: [] });
 			let userIndex = users.users.findIndex(s => s.username === target);
 			if (userIndex !== -1) {
 				users.users.splice(userIndex, 1);
@@ -215,8 +237,8 @@ function validateToken(token) {
 
 function verifyLogin(username, password){
 	//check username exists
-	const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-	const guests = JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8'));
+	const users = readJsonFile(USERS_FILE, { users: [] });
+	const guests = readJsonFile(GUESTS_FILE, { guests: [] });
 
 	let guest = guests.guests.find(s => s.username === username);
 	let user = users.users.find(s => s.username === username);
@@ -239,7 +261,7 @@ function verifyLogin(username, password){
 
 //add new guest to GUEST_FILE and return guest username
 function addGuest(){
-	const guests = JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8'));
+	const guests = readJsonFile(GUESTS_FILE, { guests: [] });
 
 	//create new guest account
 	let newID = 0;
@@ -255,9 +277,7 @@ function addGuest(){
 	const newGuest = {"username": username, "id": newID};
 	guests.guests.push(newGuest);
 
-	fs.writeFileSync(GUESTS_FILE, JSON.stringify(guests, null, 2), (err) => {
-		if (err) throw err;
-	});
+	fs.writeFileSync(GUESTS_FILE, JSON.stringify(guests, null, 2));
 	return username;
 }
 
